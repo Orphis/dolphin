@@ -260,6 +260,8 @@ else()
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+	include_directories(SYSTEM "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1")
+
 	if(NOT OSX_USE_DEFAULT_SEARCH_PATH)
 		# Hack up the path to prioritize the path to built-in OS libraries to
 		# increase the chance of not depending on a bunch of copies of them
