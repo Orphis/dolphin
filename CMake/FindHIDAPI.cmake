@@ -7,3 +7,13 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(HIDAPI DEFAULT_MSG HIDAPI_LIBRARY HIDAPI_INCLUDE_DIR)
 
 mark_as_advanced(HIDAPI_INCLUDE_DIR HIDAPI_LIBRARY)
+
+if(HIDAPI_FOUND)
+  if(NOT TARGET HIDAPI::HIDAPI)
+    add_library(HIDAPI::HIDAPI UNKNOWN IMPORTED)
+    set_target_properties(HIDAPI::HIDAPI PROPERTIES
+      IMPORTED_LOCATION ${HIDAPI_LIBRARY}
+      INTERFACE_INCLUDE_DIRECTORIES ${HIDAPI_INCLUDE_DIR}
+    )
+  endif()
+endif()
