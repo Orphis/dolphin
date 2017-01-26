@@ -315,8 +315,9 @@ else()
 	message(STATUS "BlueZ explicitly disabled, disabling bluetooth support")
 endif()
 
-if(HIDAPI_FOUND)
+if(TARGET External::hidapi)
 	set(SRCS ${SRCS} HW/WiimoteReal/IOhidapi.cpp)
+	set(LIBS ${LIBS} External::hidapi)
 endif()
 
 if(PORTAUDIO_FOUND)

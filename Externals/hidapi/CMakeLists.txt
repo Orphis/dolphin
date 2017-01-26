@@ -1,0 +1,31 @@
+find_package(HIDAPI QUIET)
+if(HIDAPI_FOUND)
+  message(STATUS "Using shared ${HIDAPI_LIBRARIES} ${HIDAPI_VERSION}")
+  add_library(hidapi INTERFACE)
+  add_library(External::hidapi ALIAS hidapi)
+  target_link_libraries(hidapi INTERFACE HIDAPI::HIDAPI)
+  target_compile_definitions(hidapi INTERFACE HAVE_HIDAPI=1)
+
+  return()
+endif()
+
+if(ANDROID)
+  return()
+endif()
+
+message(STATUS "Using static hidapi from Externals")
+
+add_library(hidapi STATIC hidapi/hidapi.h)
+add_library(External::hidapi ALIAS hidapi)
+target_include_directories(hidapi PUBLIC hidapi)
+target_compile_definitions(hidapi INTERFACE HAVE_HIDAPI=1)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  target_sources(hidapi PRIVATE mac/hid.c)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  target_sources(hidapi PRIVATE linux/hid.c)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  target_sources(hidapi PRIVATE windows/hid.c)
+else()
+  target_sources(hidapi PRIVATE libusb/hid.c)
+endif()
