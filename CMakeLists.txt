@@ -909,3 +909,34 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_BINARY_DIR}")
 # CPack must be included after the CPACK_* variables are set in order for those
 # variables to take effect.
 Include(CPack)
+
+set(externals
+  bdisasm
+  enet
+  glslang
+  gtest
+  gtest_main
+  hidapi
+  lzo2
+  mbedcrypto
+  mbedtls
+  mbedx509
+  miniupnpc
+  png
+  portaudio_static
+  SOIL
+  sfml-network
+  sfml-system
+  SoundTouch
+  usb
+  wx
+  xxhash
+)
+foreach(ext ${externals})
+  if(TARGET ${ext})
+    get_target_property(type usb TYPE)
+    if(TYPE MATCHES "STATIC_LIBRARY|SHARED_LIBRARY")
+      set_property(TARGET ${ext} PROPERTY FOLDER "Externals")
+    endif()
+  endif()
+endforeach()
