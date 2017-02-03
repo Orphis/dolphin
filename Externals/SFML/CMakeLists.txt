@@ -1,5 +1,3 @@
-include_directories(BEFORE include src)
-
 set(SRC_NETWORK
 	src/SFML/Network/Http.cpp
 	src/SFML/Network/IPAddress.cpp
@@ -24,4 +22,11 @@ set(SRC_SYSTEM
 )
 
 add_library(sfml-network ${SRC_NETWORK})
+target_compile_definitions(sfml-network PUBLIC SFML_STATIC)
+target_include_directories(sfml-network PUBLIC include)
+target_include_directories(sfml-network PRIVATE src)
+
 add_library(sfml-system ${SRC_SYSTEM})
+target_compile_definitions(sfml-system PUBLIC SFML_STATIC)
+target_include_directories(sfml-system PUBLIC include)
+target_include_directories(sfml-system PRIVATE src)

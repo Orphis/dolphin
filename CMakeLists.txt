@@ -668,16 +668,22 @@ if(NOT ANDROID)
 endif()
 
 set(SFML_REQD_VERSION 2.1)
-if(NOT APPLE)
-	find_package(SFML ${SFML_REQD_VERSION} COMPONENTS network system)
-endif()
+find_package(SFML ${SFML_REQD_VERSION} COMPONENTS network system)
 if(SFML_FOUND)
 	message(STATUS "Using shared SFML")
+	add_library(sfml-network UNKNOWN IMPORTED)
+	set_target_properties(sfml-network PROPERTIES
+		IMPORTED_LOCATION ${SFML_NETWORK_LIBRARY}
+		INTERFACE_INCLUDE_DIRECTORIES ${SFML_INCLUDE_DIR}
+	)
+	add_library(sfml-system UNKNOWN IMPORTED)
+	set_target_properties(sfml-system PROPERTIES
+		IMPORTED_LOCATION ${SFML_SYSTEM_LIBRARY}
+		INTERFACE_INCLUDE_DIRECTORIES ${SFML_INCLUDE_DIR}
+	)
 else()
 	message(STATUS "Using static SFML ${SFML_REQD_VERSION} from Externals")
-	add_definitions(-DSFML_STATIC)
 	add_subdirectory(Externals/SFML)
-	include_directories(BEFORE Externals/SFML/include)
 endif()
 
 if(USE_UPNP)
