@@ -55,7 +55,7 @@ if(ANDROID)
   set(SRCS ${SRCS} GCAdapter_Android.cpp)
 else()
   set(SRCS ${SRCS} GCAdapter.cpp)
-  set(LIBS ${LIBS} ${LIBUSB_LIBRARIES})
+  set(LIBS ${LIBS} External::libusb)
 endif()
 
 if(LIBEVDEV_FOUND AND LIBUDEV_FOUND)

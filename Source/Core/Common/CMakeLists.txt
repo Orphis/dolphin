@@ -34,10 +34,10 @@ set(SRCS Analytics.cpp
          Crypto/ec.cpp
          Logging/LogManager.cpp)
 
-if(LIBUSB_FOUND)
-	set(LIBS ${LIBS} ${LIBUSB_LIBRARIES})
+if(TARGET External::libusb)
+	set(LIBS ${LIBS} External::libusb)
 	set(SRCS ${SRCS} LibusbContext.cpp)
-endif(LIBUSB_FOUND)
+endif()
 
 if(ANDROID)
 	set(SRCS ${SRCS}

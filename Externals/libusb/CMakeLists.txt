@@ -1,3 +1,21 @@
+if(ANDROID)
+  # We don't want it at all on Android for now
+  return()
+endif()
+
+find_package(LibUSB QUIET)
+if(LIBUSB_FOUND)
+  message(STATUS "Using shared LibUSB")
+  add_library(usb INTERFACE)
+  add_library(External::libusb ALIAS usb)
+  target_link_libraries(usb INTERFACE LibUSB::LibUSB)
+  target_compile_definitions(usb INTERFACE __LIBUSB__)
+
+  return()
+endif()
+
+message(STATUS "Using static LibUSB from Externals")
+
 add_library(usb STATIC EXCLUDE_FROM_ALL
     libusb/core.c
     libusb/core.c
@@ -75,12 +93,7 @@ if(UNIX)
         libusb/os/threads_posix.c
     )
     find_package(Threads REQUIRED)
-    if(THREADS_HAVE_PTHREAD_ARG)
-      target_compile_options(usb PUBLIC "-pthread")
-    endif()
-    if(CMAKE_THREAD_LIBS_INIT)
-      target_link_libraries(usb PRIVATE "${CMAKE_THREAD_LIBS_INIT}")
-    endif()
+    target_link_libraries(usb PRIVATE Threads::Threads)
     set(THREADS_POSIX TRUE)
 elseif(WIN32)
     target_sources(usb PRIVATE
@@ -117,5 +130,7 @@ endif()
 
 check_include_files(sys/timerfd.h USBI_TIMERFD_AVAILABLE)
 
-
 configure_file(config.h.in config.h)
+
+target_compile_definitions(usb INTERFACE __LIBUSB__)
+add_library(External::libusb ALIAS usb)

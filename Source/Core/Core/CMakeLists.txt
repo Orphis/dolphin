@@ -268,9 +268,9 @@ set(LIBS
 	z
 	)
 
-if(LIBUSB_FOUND)
+if(TARGET External::libusb)
 	# Using shared LibUSB
-	set(LIBS	${LIBS}	${LIBUSB_LIBRARIES})
+	set(LIBS	${LIBS} External::libusb)
 	set(SRCS	${SRCS}	IOS/USB/LibusbDevice.cpp
 	        	       	IOS/USB/Bluetooth/BTReal.cpp)
 endif()
