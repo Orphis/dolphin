@@ -3,3 +3,4 @@
 add_subdirectory(gtest)
 add_subdirectory(hidapi)
 add_subdirectory(libusb)
+add_subdirectory(soundtouch)
