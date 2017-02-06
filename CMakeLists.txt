@@ -428,6 +428,8 @@ endif()
 # TODO: We should have options for dependencies included in the externals to
 # override autodetection of system libraries and force the usage of the
 # externals.
+add_subdirectory(Externals EXCLUDE_FROM_ALL)
+
 include(CheckLib)
 include(CheckCXXSourceRuns)
 
