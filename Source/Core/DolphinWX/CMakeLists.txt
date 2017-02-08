@@ -122,7 +122,7 @@ set(DOLPHIN_EXE ${DOLPHIN_EXE_BASE})
 
 if(wxWidgets_FOUND)
 	add_executable(${DOLPHIN_EXE} ${SRCS} ${GUI_SRCS})
-	target_link_libraries(${DOLPHIN_EXE} ${LIBS} ${WXLIBS})
+	target_link_libraries(${DOLPHIN_EXE} ${LIBS} ${WXLIBS} sfml-network sfml-system)
 
 	# Handle localization
 	find_package(Gettext)
