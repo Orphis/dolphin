@@ -98,7 +98,7 @@ elseif(USE_X11)
         set(LIBS ${LIBS} ${OPENGL_LIBRARIES})
     endif()
     set(SRCS ${SRCS} GL/GLInterface/X11_Util.cpp)
-    set(LIBS ${LIBS} ${XRANDR_LIBRARIES})
+    #set(LIBS ${LIBS} ${XRANDR_LIBRARIES})
 endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")

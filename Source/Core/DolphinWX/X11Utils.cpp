@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "Common/DynamicLoader.h"
 #include "Common/Logging/Log.h"
 #include "Core/ConfigManager.h"
 #include "Core/Core.h"
@@ -18,6 +19,7 @@ extern char** environ;
 
 namespace X11Utils
 {
+
 bool ToggleFullscreen(Display* dpy, Window win)
 {
   // Init X event structure for _NET_WM_STATE_FULLSCREEN client message
@@ -66,7 +68,7 @@ XRRConfiguration::XRRConfiguration(Display* _dpy, Window _win)
 {
   int XRRMajorVersion, XRRMinorVersion;
 
-  if (!XRRQueryVersion(dpy, &XRRMajorVersion, &XRRMinorVersion) ||
+  if (!xrr.XRRQueryVersion(dpy, &XRRMajorVersion, &XRRMinorVersion) ||
       (XRRMajorVersion < 1 || (XRRMajorVersion == 1 && XRRMinorVersion < 3)))
   {
     WARN_LOG(VIDEO, "XRRExtension not supported.");
@@ -74,7 +76,7 @@ XRRConfiguration::XRRConfiguration(Display* _dpy, Window _win)
     return;
   }
 
-  screenResources = XRRGetScreenResourcesCurrent(dpy, win);
+  screenResources = xrr.XRRGetScreenResourcesCurrent(dpy, win);
 
   screen = DefaultScreen(dpy);
   fb_width = DisplayWidth(dpy, screen);
@@ -91,11 +93,11 @@ XRRConfiguration::~XRRConfiguration()
   if (bValid && bIsFullscreen)
     ToggleDisplayMode(False);
   if (screenResources)
-    XRRFreeScreenResources(screenResources);
+    xrr.XRRFreeScreenResources(screenResources);
   if (outputInfo)
-    XRRFreeOutputInfo(outputInfo);
+    xrr.XRRFreeOutputInfo(outputInfo);
   if (crtcInfo)
-    XRRFreeCrtcInfo(crtcInfo);
+    xrr.XRRFreeCrtcInfo(crtcInfo);
 }
 
 void XRRConfiguration::Update()
@@ -108,12 +110,12 @@ void XRRConfiguration::Update()
 
   if (outputInfo)
   {
-    XRRFreeOutputInfo(outputInfo);
+    xrr.XRRFreeOutputInfo(outputInfo);
     outputInfo = nullptr;
   }
   if (crtcInfo)
   {
-    XRRFreeCrtcInfo(crtcInfo);
+    xrr.XRRFreeCrtcInfo(crtcInfo);
     crtcInfo = nullptr;
   }
   fullMode = 0;
@@ -137,10 +139,10 @@ void XRRConfiguration::Update()
   for (int i = 0; i < screenResources->noutput; i++)
   {
     XRROutputInfo* output_info =
-        XRRGetOutputInfo(dpy, screenResources, screenResources->outputs[i]);
+        xrr.XRRGetOutputInfo(dpy, screenResources, screenResources->outputs[i]);
     if (output_info && output_info->crtc && output_info->connection == RR_Connected)
     {
-      XRRCrtcInfo* crtc_info = XRRGetCrtcInfo(dpy, screenResources, output_info->crtc);
+      XRRCrtcInfo* crtc_info = xrr.XRRGetCrtcInfo(dpy, screenResources, output_info->crtc);
       if (crtc_info)
       {
         if (!output_name || !strcmp(output_name, output_info->name))
@@ -183,10 +185,10 @@ void XRRConfiguration::Update()
         }
       }
       if (crtc_info && crtcInfo != crtc_info)
-        XRRFreeCrtcInfo(crtc_info);
+        xrr.XRRFreeCrtcInfo(crtc_info);
     }
     if (output_info && outputInfo != output_info)
-      XRRFreeOutputInfo(output_info);
+      xrr.XRRFreeOutputInfo(output_info);
   }
   fs_fb_width_mm = fs_fb_width * DisplayHeightMM(dpy, screen) / DisplayHeight(dpy, screen);
   fs_fb_height_mm = fs_fb_height * DisplayHeightMM(dpy, screen) / DisplayHeight(dpy, screen);
@@ -215,16 +217,16 @@ void XRRConfiguration::ToggleDisplayMode(bool bFullscreen)
   XGrabServer(dpy);
   if (bFullscreen)
   {
-    XRRSetCrtcConfig(dpy, screenResources, outputInfo->crtc, CurrentTime, crtcInfo->x, crtcInfo->y,
+    xrr.XRRSetCrtcConfig(dpy, screenResources, outputInfo->crtc, CurrentTime, crtcInfo->x, crtcInfo->y,
                      fullMode, crtcInfo->rotation, crtcInfo->outputs, crtcInfo->noutput);
-    XRRSetScreenSize(dpy, win, fs_fb_width, fs_fb_height, fs_fb_width_mm, fs_fb_height_mm);
+    xrr.XRRSetScreenSize(dpy, win, fs_fb_width, fs_fb_height, fs_fb_width_mm, fs_fb_height_mm);
     bIsFullscreen = true;
   }
   else
   {
-    XRRSetCrtcConfig(dpy, screenResources, outputInfo->crtc, CurrentTime, crtcInfo->x, crtcInfo->y,
+    xrr.XRRSetCrtcConfig(dpy, screenResources, outputInfo->crtc, CurrentTime, crtcInfo->x, crtcInfo->y,
                      crtcInfo->mode, crtcInfo->rotation, crtcInfo->outputs, crtcInfo->noutput);
-    XRRSetScreenSize(dpy, win, fb_width, fb_height, fb_width_mm, fb_height_mm);
+    xrr.XRRSetScreenSize(dpy, win, fb_width, fb_height, fb_width_mm, fb_height_mm);
     bIsFullscreen = false;
   }
   XUngrabServer(dpy);
@@ -240,7 +242,7 @@ void XRRConfiguration::AddResolutions(std::vector<std::string>& resos)
   for (int i = 0; i < screenResources->noutput; i++)
   {
     XRROutputInfo* output_info =
-        XRRGetOutputInfo(dpy, screenResources, screenResources->outputs[i]);
+        xrr.XRRGetOutputInfo(dpy, screenResources, screenResources->outputs[i]);
 
     if (output_info && output_info->crtc && output_info->connection == RR_Connected)
     {
@@ -264,7 +266,7 @@ void XRRConfiguration::AddResolutions(std::vector<std::string>& resos)
       }
     }
     if (output_info)
-      XRRFreeOutputInfo(output_info);
+      xrr.XRRFreeOutputInfo(output_info);
   }
 }
 

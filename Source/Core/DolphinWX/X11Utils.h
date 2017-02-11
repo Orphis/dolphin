@@ -14,6 +14,7 @@
 
 #if defined(HAVE_XRANDR) && HAVE_XRANDR
 #include <X11/extensions/Xrandr.h>
+#include "Common/DynamicLoader.h"
 #endif
 #include <X11/X.h>
 #include <X11/Xlib.h>
@@ -33,6 +34,22 @@ Display* XDisplayFromHandle(void* Handle);
 void InhibitScreensaver(Display* dpy, Window win, bool suspend);
 
 #if defined(HAVE_XRANDR) && HAVE_XRANDR
+
+class DynamicXRandr : public DynamicLoaderBase {
+ public:
+  DynamicXRandr() : DynamicLoaderBase("Xrandr") {}
+
+  DL_IMPORT_FUNC(XRRFreeCrtcInfo);
+  DL_IMPORT_FUNC(XRRFreeOutputInfo);
+  DL_IMPORT_FUNC(XRRFreeScreenResources);
+  DL_IMPORT_FUNC(XRRGetCrtcInfo);
+  DL_IMPORT_FUNC(XRRGetOutputInfo);
+  DL_IMPORT_FUNC(XRRGetScreenResourcesCurrent);
+  DL_IMPORT_FUNC(XRRQueryVersion);
+  DL_IMPORT_FUNC(XRRSetCrtcConfig);
+  DL_IMPORT_FUNC(XRRSetScreenSize);
+};
+
 class XRRConfiguration
 {
 public:
@@ -44,6 +61,7 @@ public:
   void AddResolutions(std::vector<std::string>& resos);
 
 private:
+  DynamicXRandr xrr;
   Display* dpy;
   Window win;
   int screen;
