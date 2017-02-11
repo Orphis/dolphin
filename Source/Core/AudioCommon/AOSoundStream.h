@@ -8,6 +8,7 @@
 #include <thread>
 
 #include "AudioCommon/SoundStream.h"
+#include "Common/DynamicLoader.h"
 #include "Common/Event.h"
 #include "Common/Thread.h"
 
@@ -18,6 +19,19 @@
 class AOSound final : public SoundStream
 {
 #if defined(HAVE_AO) && HAVE_AO
+  class DynamicAO : public DynamicLoaderBase {
+   public:
+    DynamicAO() : DynamicLoaderBase("ao") {}
+
+    DL_IMPORT_FUNC(ao_close);
+    DL_IMPORT_FUNC(ao_default_driver_id);
+    DL_IMPORT_FUNC(ao_initialize);
+    DL_IMPORT_FUNC(ao_open_live);
+    DL_IMPORT_FUNC(ao_play);
+    DL_IMPORT_FUNC(ao_shutdown);
+  };
+
+  DynamicAO ao;
   std::thread thread;
   Common::Flag m_run_thread;
   std::mutex soundCriticalSection;
@@ -37,6 +51,6 @@ public:
   void Stop() override;
   void Update() override;
 
-  static bool isValid() { return true; }
+  static bool isValid() { return DynamicAO().IsLoaded(); }
 #endif
 };
